@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify - Web Player</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-spotify"></i>
+                <h2>Spotify</h2>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-search"></i>
+                    <span>Search</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fas fa-compact-disc"></i>
+                    <span>Your Library</span>
+                </a>
+            </nav>
+
+            <div class="playlists">
+                <h3>Playlists</h3>
+                <a href="#" class="playlist-item">My Favorite Songs</a>
+                <a href="#" class="playlist-item">Study Session</a>
+                <a href="#" class="playlist-item">Workout Mix</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Your Own Song -->
+            <section class="upload-section">
+                <h2>Upload Your Song</h2>
+
+                <div class="upload-box">
+                    <input type="file" id="songUpload" accept="audio/*">
+
+                    <button id="uploadBtn">
+                        <i class="fas fa-upload"></i>
+                        Upload Song
+                    </button>
+                </div>
+            </section>
+            <!-- Header with User Profile -->
+            <header class="header">
+                <div class="header-left">
+                    <input type="text" placeholder="Search songs, artists, playlists..." class="search-bar">
+                </div>
+                <div class="header-right">
+                    <button class="btn-user">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Profile</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Featured Section -->
+            <section class="featured">
+                <h1>New Music Friday</h1>
+                <p>Discover the hottest new tracks</p>
+            </section>
+
+            <!-- Songs Grid -->
+            <section class="songs-section">
+                <h2>Featured Playlist</h2>
+                <div class="songs-container">
+                    <!-- Song Card 1 -->
+                    <div class="song-card">
+                        <div class="song-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="song-info">
+                            <h3>Fresher Student</h3>
+                            <p>College Vibes</p>
+                        </div>
+                    </div>
+
+                    <!-- Song Card 2 -->
+                    <div class="song-card">
+                        <div class="song-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="song-info">
+                            <h3>College Dreams</h3>
+                            <p>Indie Pop</p>
+                        </div>
+                    </div>
+
+                    <!-- Song Card 3 -->
+                    <div class="song-card">
+                        <div class="song-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="song-info">
+                            <h3>Student Life</h3>
+                            <p>Hip Hop</p>
+                        </div>
+                    </div>
+
+                    <!-- Song Card 4 -->
+                    <div class="song-card">
+                        <div class="song-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="song-info">
+                            <h3>Midnight Study</h3>
+                            <p>Lo-Fi Hip Hop</p>
+                        </div>
+                    </div>
+
+                    <!-- Song Card 5 -->
+                    <div class="song-card">
+                        <div class="song-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="song-info">
+                            <h3>Young & Free</h3>
+                            <p>Indie Rock</p>
+                        </div>
+                    </div>
+
+                    <!-- Song Card 6 -->
+                    <div class="song-card">
+                        <div class="song-image" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);">
+                            <div class="play-btn">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                        <div class="song-info">
+                            <h3>Campus Nights</h3>
+                            <p>Electronic</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Popular Tracks Table -->
+            <section class="popular-section">
+                <h2>Popular Tracks</h2>
+                <table class="tracks-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Fresher Student</td>
+                            <td>College Vibes</td>
+                            <td>New Beginning</td>
+                            <td>3:45</td>
+                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>College Dreams</td>
+                            <td>Indie Pop Star</td>
+                            <td>Teenage Dreams</td>
+                            <td>4:12</td>
+                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Student Life</td>
+                            <td>Urban Beats</td>
+                            <td>City Stories</td>
+                            <td>3:28</td>
+                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Midnight Study</td>
+                            <td>Lo-Fi Chill</td>
+                            <td>Late Night Sessions</td>
+                            <td>5:03</td>
+                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Young & Free</td>
+                            <td>The Rockers</td>
+                            <td>Freedom Anthem</td>
+                            <td>4:35</td>
+                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Campus Nights</td>
+                            <td>Electronic Sync</td>
+                            <td>Night Vibes</td>
+                            <td>3:52</td>
+                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Music Player (Fixed at Bottom) -->
+    <footer class="player">
+        <div class="player-left">
+            <div class="player-track-info">
+                <div class="player-album-art" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                </div>
+                <div class="player-text">
+                    <p class="player-song">Fresher Student</p>
+                    <p class="player-artist">College Vibes</p>
+                </div>
+            </div>
+            <button class="heart-btn"><i class="far fa-heart"></i></button>
+        </div>
+
+        <div class="player-center">
+            <div class="player-controls">
+                <button class="control-btn"><i class="fas fa-step-backward"></i></button>
+                <button class="control-btn play-btn-large"><i class="fas fa-play"></i></button>
+                <button class="control-btn"><i class="fas fa-step-forward"></i></button>
+            </div>
+            <div class="progress-bar">
+                <span class="time">1:23</span>
+                <div class="progress">
+                    <div class="progress-fill" style="width: 30%;"></div>
+                </div>
+                <span class="time">3:45</span>
+            </div>
+        </div>
+
+        <div class="player-right">
+            <button class="volume-btn"><i class="fas fa-volume-up"></i></button>
+            <div class="volume-bar">
+                <input type="range" min="0" max="100" value="70" class="volume-slider">
+            </div>
+            <button class="fullscreen-btn"><i class="fas fa-expand"></i></button>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
