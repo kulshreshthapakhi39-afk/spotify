@@ -1,3 +1,58 @@
+const folderSongs = [
+    { title: 'Audio 1', artist: 'Folder Track', src: 'audio/Audio1.mp3' },
+    { title: 'Audio 2', artist: 'Folder Track', src: 'audio/Audio2.mp3' },
+    { title: 'Audio 3', artist: 'Folder Track', src: 'audio/audio3.mp3' },
+    { title: 'Audio 4', artist: 'Folder Track', src: 'audio/audio4.mp3' },
+    { title: 'Audio 5', artist: 'Folder Track', src: 'audio/Audio5.mp3' },
+    { title: 'Audio 6', artist: 'Folder Track', src: 'audio/Audio6.mp3' }
+];
+
+const audioPlayer = document.getElementById('audioPlayer');
+const folderSongsContainer = document.getElementById('folderSongsContainer');
+const playerSong = document.querySelector('.player-song');
+const playerArtist = document.querySelector('.player-artist');
+
+function renderFolderSongs() {
+    if (!folderSongsContainer) return;
+    folderSongsContainer.innerHTML = '';
+
+    folderSongs.forEach((song, index) => {
+        const card = document.createElement('div');
+        card.className = 'song-card';
+        card.innerHTML = `
+            <div class="song-image" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%);">
+                <div class="play-btn">
+                    <i class="fas fa-play"></i>
+                </div>
+            </div>
+            <div class="song-info">
+                <h3>${song.title}</h3>
+                <p>${song.artist}</p>
+            </div>
+        `;
+
+        card.addEventListener('click', () => {
+            playFolderSong(index);
+        });
+
+        folderSongsContainer.appendChild(card);
+    });
+}
+
+function playFolderSong(index) {
+    const song = folderSongs[index];
+    if (!song || !audioPlayer) return;
+
+    audioPlayer.src = song.src;
+    audioPlayer.play().catch(() => {
+        console.log(`Unable to play ${song.title}.`);
+    });
+    playerSong.textContent = song.title;
+    playerArtist.textContent = song.artist;
+}
+
+renderFolderSongs();
+
 // Play button functionality
 document.querySelectorAll('.play-btn, .play-small, .play-btn-large').forEach(btn => {
     btn.addEventListener('click', function (e) {
