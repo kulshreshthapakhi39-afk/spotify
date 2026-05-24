@@ -275,4 +275,3 @@ document.querySelectorAll('.playlist-item').forEach(item => {
 });
 
 console.log('Spotify Website Loaded Successfully! 🎵');
-
