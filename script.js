@@ -273,5 +273,4 @@ document.querySelectorAll('.playlist-item').forEach(item => {
         console.log(`Opened playlist: ${this.textContent}`);
     });
 });
-
 console.log('Spotify Website Loaded Successfully! 🎵');
