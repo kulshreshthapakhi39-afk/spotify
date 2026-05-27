@@ -7,6 +7,8 @@ const folderSongs = [
     { title: 'Audio 6', artist: 'Folder Track', src: 'audio/Audio6.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)' }
 ];
 
+
+
 const audioPlayer = document.getElementById('audioPlayer');
 const folderSongsContainer = document.getElementById('folderSongsContainer');
 const playerSong = document.querySelector('.player-song');
