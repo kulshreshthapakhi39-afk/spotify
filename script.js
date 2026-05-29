@@ -13,11 +13,24 @@ const audioPlayer = document.getElementById('audioPlayer');
 const folderSongsContainer = document.getElementById('folderSongsContainer');
 const playerSong = document.querySelector('.player-song');
 const playerArtist = document.querySelector('.player-artist');
+const uploadBtn = document.getElementById('uploadBtn');
+const songUpload = document.getElementById('songUpload');
 
 // Playlist state
 let currentSongIndex = -1;
 let isPlayingAll = false;
 let isPlaying = false;
+
+function setNowPlaying(song) {
+    playerSong.textContent = song.title;
+    playerArtist.textContent = song.artist;
+    const playerAlbumArt = document.querySelector('.player-album-art');
+    if (playerAlbumArt) {
+        playerAlbumArt.style.backgroundImage = song.image ? `url('${song.image}')` : song.gradient || '';
+        playerAlbumArt.style.backgroundSize = 'cover';
+        playerAlbumArt.style.backgroundPosition = 'center';
+    }
+}
 
 function renderFolderSongs() {
     if (!folderSongsContainer) return;
@@ -57,16 +70,7 @@ function playFolderSong(index) {
     audioPlayer.play().catch(() => {
         console.log(`Unable to play ${song.title}.`);
     });
-    playerSong.textContent = song.title;
-    playerArtist.textContent = song.artist;
-
-    // Update player album art
-    const playerAlbumArt = document.querySelector('.player-album-art');
-    if (playerAlbumArt && song.image) {
-        playerAlbumArt.style.backgroundImage = `url('${song.image}')`;
-        playerAlbumArt.style.backgroundSize = 'cover';
-        playerAlbumArt.style.backgroundPosition = 'center';
-    }
+    setNowPlaying(song);
 
     isPlaying = true;
 
@@ -119,6 +123,19 @@ renderFolderSongs();
 
 // Play All button functionality
 const playAllBtn = document.getElementById('playAllBtn');
+
+function filterCards(query) {
+    const term = query.toLowerCase().trim();
+    document.querySelectorAll('.song-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(term) ? '' : 'none';
+    });
+}
+
+const searchBar = document.querySelector('.search-bar');
+if (searchBar) {
+    searchBar.addEventListener('input', (e) => filterCards(e.target.value));
+}
 if (playAllBtn) {
     playAllBtn.addEventListener('click', function () {
         if (folderSongs.length > 0) {
@@ -200,7 +217,6 @@ document.querySelectorAll('.song-card').forEach(card => {
 });
 
 // Search functionality
-const searchBar = document.querySelector('.search-bar');
 if (searchBar) {
     searchBar.addEventListener('focus', function () {
         this.style.boxShadow = '0 0 0 2px #1DB954';
@@ -275,4 +291,29 @@ document.querySelectorAll('.playlist-item').forEach(item => {
         console.log(`Opened playlist: ${this.textContent}`);
     });
 });
+uploadBtn?.addEventListener('click', () => songUpload?.click());
+
+songUpload?.addEventListener('change', () => {
+    const file = songUpload.files[0];
+    if (!file) return;
+
+    const objectUrl = URL.createObjectURL(file);
+    currentSongIndex = 0;
+    isPlayingAll = false;
+    audioPlayer.src = objectUrl;
+    audioPlayer.play().catch(() => { });
+    setNowPlaying({ title: file.name.replace(/\.[^/.]+$/, ''), artist: 'Your Upload', image: '', gradient: 'linear-gradient(135deg, #6a5af9 0%, #22d3ee 100%)' });
+    isPlaying = true;
+    document.querySelector('.play-btn-large').innerHTML = '<i class="fas fa-pause"></i>';
+    document.querySelector('.player-song').textContent = file.name.replace(/\.[^/.]+$/, '');
+    document.querySelector('.player-artist').textContent = 'Your Upload';
+});
+
+const greeting = document.querySelector('.eyebrow');
+if (greeting) {
+    const hour = new Date().getHours();
+    const label = hour < 12 ? 'Morning pulse' : hour < 18 ? 'Afternoon glow' : 'Midnight pulse';
+    greeting.textContent = `${label} • Curated for late-night focus`;
+}
+
 console.log('Spotify Website Loaded Successfully! 🎵');
