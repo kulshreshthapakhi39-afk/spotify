@@ -125,7 +125,7 @@ function renderUploadedSongs() {
 
 function bindSongCardEvents() {
     document.querySelectorAll('.song-card[data-index]').forEach(card => {
-        card.removeEventListener('click', () => {});
+        card.removeEventListener('click', () => { });
         card.addEventListener('click', () => {
             const index = Number(card.dataset.index);
             if (!Number.isNaN(index)) {
