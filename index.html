@@ -55,11 +55,18 @@
                         Upload Song
                     </button>
                 </div>
+                <div class="upload-preview">
+                    <h3>Uploaded Tracks</h3>
+                    <div id="uploadedSongsContainer" class="uploaded-list">
+                        <p class="upload-placeholder">No uploaded tracks yet.</p>
+                    </div>
+                </div>
             </section>
             <!-- Header with User Profile -->
             <header class="header">
                 <div class="header-left">
                     <input type="text" placeholder="Search songs, artists, playlists..." class="search-bar">
+                    <span class="favorite-count" id="favoriteCount">0 liked</span>
                 </div>
                 <div class="header-right">
                     <button class="btn-user">
@@ -110,7 +117,7 @@
                 <h2>Featured Playlist</h2>
                 <div class="songs-container">
                     <!-- Song Card 1 -->
-                    <div class="song-card">
+                    <div class="song-card" data-index="0">
                         <div class="song-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
@@ -123,7 +130,7 @@
                     </div>
 
                     <!-- Song Card 2 -->
-                    <div class="song-card">
+                    <div class="song-card" data-index="1">
                         <div class="song-image" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
@@ -137,7 +144,7 @@
 
                     <!-- Song Card 3 -->
 
-                    <div class="song-card">
+                    <div class="song-card" data-index="2">
                         <div class="song-image" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
@@ -150,7 +157,7 @@
                     </div>
 
                     <!-- Song Card 4 -->
-                    <div class="song-card">
+                    <div class="song-card" data-index="3">
                         <div class="song-image" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
@@ -163,7 +170,7 @@
                     </div>
 
                     <!-- Song Card 5 -->
-                    <div class="song-card">
+                    <div class="song-card" data-index="4">
                         <div class="song-image" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
@@ -176,7 +183,7 @@
                     </div>
 
                     <!-- Song Card 6 -->
-                    <div class="song-card">
+                    <div class="song-card" data-index="5">
                         <div class="song-image" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);">
                             <div class="play-btn">
                                 <i class="fas fa-play"></i>
@@ -217,53 +224,53 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
+                        <tr class="track-row" data-index="0">
                             <td>1</td>
                             <td>Fresher Student</td>
                             <td>College Vibes</td>
                             <td>New Beginning</td>
                             <td>3:45</td>
-                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                            <td><button class="play-small" data-index="0"><i class="fas fa-play"></i></button></td>
                         </tr>
-                        <tr>
+                        <tr class="track-row" data-index="1">
                             <td>2</td>
                             <td>College Dreams</td>
                             <td>Indie Pop Star</td>
                             <td>Teenage Dreams</td>
                             <td>4:12</td>
-                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                            <td><button class="play-small" data-index="1"><i class="fas fa-play"></i></button></td>
                         </tr>
-                        <tr>
+                        <tr class="track-row" data-index="2">
                             <td>3</td>
                             <td>Student Life</td>
                             <td>Urban Beats</td>
                             <td>City Stories</td>
                             <td>3:28</td>
-                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                            <td><button class="play-small" data-index="2"><i class="fas fa-play"></i></button></td>
                         </tr>
-                        <tr>
+                        <tr class="track-row" data-index="3">
                             <td>4</td>
                             <td>Midnight Study</td>
                             <td>Lo-Fi Chill</td>
                             <td>Late Night Sessions</td>
                             <td>5:03</td>
-                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                            <td><button class="play-small" data-index="3"><i class="fas fa-play"></i></button></td>
                         </tr>
-                        <tr>
+                        <tr class="track-row" data-index="4">
                             <td>5</td>
                             <td>Young & Free</td>
                             <td>The Rockers</td>
                             <td>Freedom Anthem</td>
                             <td>4:35</td>
-                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                            <td><button class="play-small" data-index="4"><i class="fas fa-play"></i></button></td>
                         </tr>
-                        <tr>
+                        <tr class="track-row" data-index="5">
                             <td>6</td>
                             <td>Campus Nights</td>
                             <td>Electronic Sync</td>
                             <td>Night Vibes</td>
                             <td>3:52</td>
-                            <td><button class="play-small"><i class="fas fa-play"></i></button></td>
+                            <td><button class="play-small" data-index="5"><i class="fas fa-play"></i></button></td>
                         </tr>
                     </tbody>
                 </table>
@@ -288,9 +295,11 @@
 
         <div class="player-center">
             <div class="player-controls">
+                <button class="control-btn shuffle-btn" title="Shuffle"><i class="fas fa-random"></i></button>
                 <button class="control-btn"><i class="fas fa-step-backward"></i></button>
                 <button class="control-btn play-btn-large"><i class="fas fa-play"></i></button>
                 <button class="control-btn"><i class="fas fa-step-forward"></i></button>
+                <button class="control-btn repeat-btn" title="Repeat"><i class="fas fa-redo"></i></button>
             </div>
             <div class="progress-bar">
                 <span class="time">1:23</span>

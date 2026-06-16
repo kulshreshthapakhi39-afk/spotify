@@ -149,6 +149,13 @@ body {
     font-size: 14px;
 }
 
+.favorite-count {
+    margin-left: 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
 .search-bar::placeholder {
     color: var(--text-secondary);
 }
@@ -174,6 +181,74 @@ body {
 
 .btn-user:hover {
     background-color: var(--primary-color);
+}
+
+.upload-preview {
+    margin-top: 18px;
+}
+
+.uploaded-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.upload-placeholder {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.uploaded-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.uploaded-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.uploaded-info span {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.uploaded-info small {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.uploaded-play-btn {
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.uploaded-play-btn:hover {
+    background-color: var(--hover-color);
+    transform: scale(1.05);
+}
+
+.control-btn.active {
+    background: rgba(29, 185, 84, 0.15);
+    color: var(--primary-color);
 }
 
 .btn-user i {

@@ -1,25 +1,53 @@
 const folderSongs = [
-    { title: 'Audio 1', artist: 'Folder Track', src: 'audio/Audio1.mp3', image: 'images/Image1.jpg', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-    { title: 'Audio 2', artist: 'Folder Track', src: 'audio/Audio2.mp3', image: 'images/Image2.jpg', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-    { title: 'Audio 3', artist: 'Folder Track', src: 'audio/audio3.mp3', image: 'images/Image3.jpg', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
-    { title: 'Audio 4', artist: 'Folder Track', src: 'audio/audio4.mp3', image: 'images/Image4.jpg', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-    { title: 'Audio 5', artist: 'Folder Track', src: 'audio/Audio5.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
-    { title: 'Audio 6', artist: 'Folder Track', src: 'audio/Audio6.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)' }
+    { title: 'Fresher Student', artist: 'College Vibes', src: 'audio/Audio1.mp3', image: 'images/Image1.jpg', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+    { title: 'College Dreams', artist: 'Indie Pop', src: 'audio/Audio2.mp3', image: 'images/Image2.jpg', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+    { title: 'Student Life', artist: 'Hip Hop', src: 'audio/audio3.mp3', image: 'images/Image3.jpg', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+    { title: 'Midnight Study', artist: 'Lo-Fi Hip Hop', src: 'audio/audio4.mp3', image: 'images/Image4.jpg', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+    { title: 'Young & Free', artist: 'Indie Rock', src: 'audio/Audio5.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
+    { title: 'Campus Nights', artist: 'Electronic', src: 'audio/Audio6.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)' }
 ];
-
-
 
 const audioPlayer = document.getElementById('audioPlayer');
 const folderSongsContainer = document.getElementById('folderSongsContainer');
+const uploadedSongsContainer = document.getElementById('uploadedSongsContainer');
 const playerSong = document.querySelector('.player-song');
 const playerArtist = document.querySelector('.player-artist');
 const uploadBtn = document.getElementById('uploadBtn');
 const songUpload = document.getElementById('songUpload');
+const favoriteCount = document.getElementById('favoriteCount');
+const shuffleBtn = document.querySelector('.shuffle-btn');
+const repeatBtn = document.querySelector('.repeat-btn');
+const heartBtn = document.querySelector('.heart-btn');
 
 // Playlist state
 let currentSongIndex = -1;
 let isPlayingAll = false;
 let isPlaying = false;
+let shuffleMode = false;
+let repeatMode = false;
+const likedSongs = new Set(JSON.parse(localStorage.getItem('likedSongs') || '[]'));
+
+function saveLikedSongs() {
+    localStorage.setItem('likedSongs', JSON.stringify([...likedSongs]));
+}
+
+function updateFavoriteCount() {
+    if (!favoriteCount) return;
+    favoriteCount.textContent = `${likedSongs.size} liked`;
+}
+
+function updateHeartButton() {
+    if (!heartBtn) return;
+    const activeSong = folderSongs[currentSongIndex];
+    const songKey = activeSong ? `${activeSong.title} - ${activeSong.artist}` : null;
+    if (songKey && likedSongs.has(songKey)) {
+        heartBtn.classList.add('liked');
+        heartBtn.innerHTML = '<i class="fas fa-heart"></i>';
+    } else {
+        heartBtn.classList.remove('liked');
+        heartBtn.innerHTML = '<i class="far fa-heart"></i>';
+    }
+}
 
 function setNowPlaying(song) {
     playerSong.textContent = song.title;
@@ -30,6 +58,7 @@ function setNowPlaying(song) {
         playerAlbumArt.style.backgroundSize = 'cover';
         playerAlbumArt.style.backgroundPosition = 'center';
     }
+    updateHeartButton();
 }
 
 function renderFolderSongs() {
@@ -39,6 +68,7 @@ function renderFolderSongs() {
     folderSongs.forEach((song, index) => {
         const card = document.createElement('div');
         card.className = 'song-card';
+        card.dataset.index = index;
         card.innerHTML = `
             <div class="song-image" style="background: ${song.gradient};">
                 <img src="${song.image}" alt="${song.title}" class="song-img" onerror="this.style.display='none'">
@@ -61,6 +91,92 @@ function renderFolderSongs() {
     });
 }
 
+function renderUploadedSongs() {
+    if (!uploadedSongsContainer) return;
+    uploadedSongsContainer.innerHTML = '';
+    const uploads = folderSongs.filter(song => song.uploaded);
+
+    if (uploads.length === 0) {
+        uploadedSongsContainer.innerHTML = '<p class="upload-placeholder">No uploaded tracks yet.</p>';
+        return;
+    }
+
+    uploads.forEach((song) => {
+        const index = folderSongs.indexOf(song);
+        const item = document.createElement('div');
+        item.className = 'uploaded-item';
+        item.dataset.index = index;
+        item.innerHTML = `
+            <div class="uploaded-info">
+                <span>${song.title}</span>
+                <small>${song.artist}</small>
+            </div>
+            <button class="uploaded-play-btn"><i class="fas fa-play"></i></button>
+        `;
+
+        item.addEventListener('click', () => {
+            playFolderSong(index);
+            isPlayingAll = false;
+        });
+
+        uploadedSongsContainer.appendChild(item);
+    });
+}
+
+function bindSongCardEvents() {
+    document.querySelectorAll('.song-card[data-index]').forEach(card => {
+        card.removeEventListener('click', () => {});
+        card.addEventListener('click', () => {
+            const index = Number(card.dataset.index);
+            if (!Number.isNaN(index)) {
+                playFolderSong(index);
+                isPlayingAll = false;
+            }
+        });
+    });
+}
+
+function updatePlayButton() {
+    const playBtn = document.querySelector('.play-btn-large');
+    if (!playBtn) return;
+    playBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+}
+
+function toggleShuffle() {
+    shuffleMode = !shuffleMode;
+    if (shuffleBtn) {
+        shuffleBtn.classList.toggle('active', shuffleMode);
+    }
+}
+
+function toggleRepeat() {
+    repeatMode = !repeatMode;
+    if (repeatBtn) {
+        repeatBtn.classList.toggle('active', repeatMode);
+    }
+}
+
+function getNextIndex() {
+    if (shuffleMode) {
+        let next = Math.floor(Math.random() * folderSongs.length);
+        if (next === currentSongIndex && folderSongs.length > 1) {
+            next = (next + 1) % folderSongs.length;
+        }
+        return next;
+    }
+    const nextIndex = currentSongIndex + 1;
+    if (nextIndex < folderSongs.length) return nextIndex;
+    return repeatMode ? 0 : -1;
+}
+
+function getPreviousIndex() {
+    if (shuffleMode) {
+        return Math.floor(Math.random() * folderSongs.length);
+    }
+    if (currentSongIndex > 0) return currentSongIndex - 1;
+    return repeatMode ? folderSongs.length - 1 : currentSongIndex;
+}
+
 function playFolderSong(index) {
     const song = folderSongs[index];
     if (!song || !audioPlayer) return;
@@ -71,55 +187,54 @@ function playFolderSong(index) {
         console.log(`Unable to play ${song.title}.`);
     });
     setNowPlaying(song);
-
     isPlaying = true;
-
-    // Update play button
-    const playBtn = document.querySelector('.play-btn-large');
-    if (playBtn) {
-        playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    }
+    updatePlayButton();
 }
 
 function playNextSong() {
-    if (isPlayingAll) {
-        const nextIndex = currentSongIndex + 1;
-        if (nextIndex < folderSongs.length) {
-            playFolderSong(nextIndex);
-        } else {
-            // Reached end of playlist
-            isPlayingAll = false;
-            audioPlayer.pause();
-            isPlaying = false;
-            const playBtn = document.querySelector('.play-btn-large');
-            if (playBtn) {
-                playBtn.innerHTML = '<i class="fas fa-play"></i>';
-            }
-        }
+    const nextIndex = getNextIndex();
+    if (nextIndex !== -1) {
+        playFolderSong(nextIndex);
+        isPlayingAll = true;
+    } else {
+        isPlayingAll = false;
+        audioPlayer.pause();
+        isPlaying = false;
+        updatePlayButton();
     }
 }
 
 function playPreviousSong() {
-    if (currentSongIndex > 0) {
-        playFolderSong(currentSongIndex - 1);
+    const prevIndex = getPreviousIndex();
+    if (prevIndex >= 0 && prevIndex < folderSongs.length) {
+        playFolderSong(prevIndex);
+        isPlayingAll = false;
     }
 }
 
 function togglePlayPause() {
-    if (currentSongIndex === -1) return;
+    if (currentSongIndex === -1) {
+        if (folderSongs.length > 0) {
+            playFolderSong(0);
+            isPlayingAll = false;
+        }
+        return;
+    }
 
     if (isPlaying) {
         audioPlayer.pause();
         isPlaying = false;
-        document.querySelector('.play-btn-large').innerHTML = '<i class="fas fa-play"></i>';
     } else {
         audioPlayer.play();
         isPlaying = true;
-        document.querySelector('.play-btn-large').innerHTML = '<i class="fas fa-pause"></i>';
     }
+    updatePlayButton();
 }
 
 renderFolderSongs();
+renderUploadedSongs();
+bindSongCardEvents();
+updateFavoriteCount();
 
 // Play All button functionality
 const playAllBtn = document.getElementById('playAllBtn');
@@ -129,6 +244,14 @@ function filterCards(query) {
     document.querySelectorAll('.song-card').forEach(card => {
         const text = card.textContent.toLowerCase();
         card.style.display = text.includes(term) ? '' : 'none';
+    });
+    document.querySelectorAll('.track-row').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(term) ? '' : 'none';
+    });
+    document.querySelectorAll('.uploaded-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(term) ? '' : 'none';
     });
 }
 
@@ -144,6 +267,7 @@ if (playAllBtn) {
         }
     });
 }
+
 
 // Auto play next song when current song ends
 audioPlayer.addEventListener('ended', function () {
@@ -171,16 +295,15 @@ audioPlayer.addEventListener('timeupdate', function () {
     }
 });
 
-// Play button functionality
+// Play button animation
 document.querySelectorAll('.play-btn, .play-small').forEach(btn => {
     btn.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
-        console.log('Playing song...');
         this.style.transform = 'scale(0.95)';
         setTimeout(() => {
             this.style.transform = '';
-        }, 200);
+        }, 150);
     });
 });
 
@@ -195,28 +318,48 @@ if (playBtnLarge) {
 
 // Next and Previous buttons
 const controlBtns = document.querySelectorAll('.control-btn');
-if (controlBtns.length >= 3) {
-    // Previous button
-    controlBtns[0].addEventListener('click', function () {
+if (controlBtns.length >= 5) {
+    controlBtns[1].addEventListener('click', function () {
         playPreviousSong();
     });
-
-    // Next button
-    controlBtns[2].addEventListener('click', function () {
+    controlBtns[3].addEventListener('click', function () {
         playNextSong();
     });
 }
 
-// Song card click
-document.querySelectorAll('.song-card').forEach(card => {
-    card.addEventListener('click', function () {
-        const songTitle = this.querySelector('.song-info h3').textContent;
-        const songArtist = this.querySelector('.song-info p').textContent;
-        console.log(`Now playing: ${songTitle} by ${songArtist}`);
+// Shuffle and Repeat buttons
+if (shuffleBtn) {
+    shuffleBtn.addEventListener('click', toggleShuffle);
+}
+if (repeatBtn) {
+    repeatBtn.addEventListener('click', toggleRepeat);
+}
+
+// Table play buttons
+document.querySelectorAll('.play-small').forEach(button => {
+    const index = Number(button.dataset.index);
+    button.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!Number.isNaN(index)) {
+            playFolderSong(index);
+            isPlayingAll = false;
+        }
     });
 });
 
-// Search functionality
+// Song card click logs
+document.querySelectorAll('.song-card').forEach(card => {
+    card.addEventListener('click', function () {
+        const songTitle = this.querySelector('.song-info h3')?.textContent;
+        const songArtist = this.querySelector('.song-info p')?.textContent;
+        if (songTitle && songArtist) {
+            console.log(`Now playing: ${songTitle} by ${songArtist}`);
+        }
+    });
+});
+
+// Search focus styling
 if (searchBar) {
     searchBar.addEventListener('focus', function () {
         this.style.boxShadow = '0 0 0 2px #1DB954';
@@ -253,25 +396,30 @@ if (progress) {
 }
 
 // Heart button toggle
-const heartBtn = document.querySelector('.heart-btn');
 if (heartBtn) {
     heartBtn.addEventListener('click', function () {
-        if (this.classList.contains('liked')) {
-            this.classList.remove('liked');
-            this.innerHTML = '<i class="far fa-heart"></i>';
+        const activeSong = folderSongs[currentSongIndex];
+        if (!activeSong) return;
+        const songKey = `${activeSong.title} - ${activeSong.artist}`;
+        if (likedSongs.has(songKey)) {
+            likedSongs.delete(songKey);
         } else {
-            this.classList.add('liked');
-            this.innerHTML = '<i class="fas fa-heart"></i>';
+            likedSongs.add(songKey);
         }
+        saveLikedSongs();
+        updateFavoriteCount();
+        updateHeartButton();
     });
 }
 
 // Track table row click
-document.querySelectorAll('.tracks-table tbody tr').forEach(row => {
+document.querySelectorAll('.track-row').forEach(row => {
     row.addEventListener('click', function () {
-        const title = this.querySelector('td:nth-child(2)').textContent;
-        const artist = this.querySelector('td:nth-child(3)').textContent;
-        console.log(`Playing: ${title} - ${artist}`);
+        const title = this.querySelector('td:nth-child(2)')?.textContent;
+        const artist = this.querySelector('td:nth-child(3)')?.textContent;
+        if (title && artist) {
+            console.log(`Playing: ${title} - ${artist}`);
+        }
     });
 });
 
@@ -291,6 +439,7 @@ document.querySelectorAll('.playlist-item').forEach(item => {
         console.log(`Opened playlist: ${this.textContent}`);
     });
 });
+
 uploadBtn?.addEventListener('click', () => songUpload?.click());
 
 songUpload?.addEventListener('change', () => {
@@ -298,15 +447,30 @@ songUpload?.addEventListener('change', () => {
     if (!file) return;
 
     const objectUrl = URL.createObjectURL(file);
-    currentSongIndex = 0;
+    const title = file.name.replace(/\.[^/.]+$/, '');
+    const newSong = {
+        title,
+        artist: 'Your Upload',
+        src: objectUrl,
+        image: '',
+        gradient: 'linear-gradient(135deg, #6a5af9 0%, #22d3ee 100%)',
+        uploaded: true
+    };
+    folderSongs.push(newSong);
+    renderFolderSongs();
+    renderUploadedSongs();
+    bindSongCardEvents();
+
+    currentSongIndex = folderSongs.length - 1;
     isPlayingAll = false;
     audioPlayer.src = objectUrl;
     audioPlayer.play().catch(() => { });
-    setNowPlaying({ title: file.name.replace(/\.[^/.]+$/, ''), artist: 'Your Upload', image: '', gradient: 'linear-gradient(135deg, #6a5af9 0%, #22d3ee 100%)' });
+    setNowPlaying(newSong);
     isPlaying = true;
-    document.querySelector('.play-btn-large').innerHTML = '<i class="fas fa-pause"></i>';
-    document.querySelector('.player-song').textContent = file.name.replace(/\.[^/.]+$/, '');
-    document.querySelector('.player-artist').textContent = 'Your Upload';
+    updatePlayButton();
+    updateFavoriteCount();
+    updateHeartButton();
+    songUpload.value = '';
 });
 
 const greeting = document.querySelector('.eyebrow');
