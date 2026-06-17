@@ -82,11 +82,6 @@ function renderFolderSongs() {
             </div>
         `;
 
-        card.addEventListener('click', () => {
-            playFolderSong(index);
-            isPlayingAll = false;
-        });
-
         folderSongsContainer.appendChild(card);
     });
 }
@@ -125,7 +120,6 @@ function renderUploadedSongs() {
 
 function bindSongCardEvents() {
     document.querySelectorAll('.song-card[data-index]').forEach(card => {
-        card.removeEventListener('click', () => { });
         card.addEventListener('click', () => {
             const index = Number(card.dataset.index);
             if (!Number.isNaN(index)) {
@@ -233,7 +227,6 @@ function togglePlayPause() {
 
 renderFolderSongs();
 renderUploadedSongs();
-bindSongCardEvents();
 updateFavoriteCount();
 
 // Play All button functionality
@@ -344,17 +337,6 @@ document.querySelectorAll('.play-small').forEach(button => {
         if (!Number.isNaN(index)) {
             playFolderSong(index);
             isPlayingAll = false;
-        }
-    });
-});
-
-// Song card click logs
-document.querySelectorAll('.song-card').forEach(card => {
-    card.addEventListener('click', function () {
-        const songTitle = this.querySelector('.song-info h3')?.textContent;
-        const songArtist = this.querySelector('.song-info p')?.textContent;
-        if (songTitle && songArtist) {
-            console.log(`Now playing: ${songTitle} by ${songArtist}`);
         }
     });
 });
