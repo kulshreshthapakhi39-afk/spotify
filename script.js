@@ -14,6 +14,7 @@ const playerSong = document.querySelector('.player-song');
 const playerArtist = document.querySelector('.player-artist');
 const uploadBtn = document.getElementById('uploadBtn');
 const songUpload = document.getElementById('songUpload');
+const fileLabel = document.getElementById('fileLabel');
 const favoriteCount = document.getElementById('favoriteCount');
 const shuffleBtn = document.querySelector('.shuffle-btn');
 const repeatBtn = document.querySelector('.repeat-btn');
@@ -427,6 +428,10 @@ uploadBtn?.addEventListener('click', () => songUpload?.click());
 songUpload?.addEventListener('change', () => {
     const file = songUpload.files[0];
     if (!file) return;
+
+    if (fileLabel) {
+        fileLabel.textContent = file.name.length > 24 ? `${file.name.slice(0, 21)}...` : file.name;
+    }
 
     const objectUrl = URL.createObjectURL(file);
     const title = file.name.replace(/\.[^/.]+$/, '');
