@@ -467,5 +467,4 @@ if (greeting) {
     greeting.textContent = `${label} • Curated for late-night focus`;
 }
 
-
 console.log('Spotify Website Loaded Successfully! 🎵');
