@@ -967,6 +967,7 @@ body {
     .songs-container {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
+    
 
     .search-bar {
         width: 100%;
