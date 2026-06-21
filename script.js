@@ -3,8 +3,7 @@ const folderSongs = [
     { title: 'College Dreams', artist: 'Indie Pop', src: 'audio/Audio2.mp3', image: 'images/Image2.jpg', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
     { title: 'Student Life', artist: 'Hip Hop', src: 'audio/audio3.mp3', image: 'images/Image3.jpg', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
     { title: 'Midnight Study', artist: 'Lo-Fi Hip Hop', src: 'audio/audio4.mp3', image: 'images/Image4.jpg', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-    { title: 'Young & Free', artist: 'Indie Rock', src: 'audio/Audio5.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' },
-    { title: 'Campus Nights', artist: 'Electronic', src: 'audio/Audio6.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%)' }
+    { title: 'Young & Free', artist: 'Indie Rock', src: 'audio/Audio5.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' }
 ];
 
 const audioPlayer = document.getElementById('audioPlayer');
