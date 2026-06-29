@@ -465,4 +465,5 @@ if (greeting) {
     const label = hour < 12 ? 'Morning pulse' : hour < 18 ? 'Afternoon glow' : 'Midnight pulse';
     greeting.textContent = `${label} • Curated for late-night focus`;
 }
+
 console.log('Spotify Website Loaded Successfully! 🎵');
