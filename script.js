@@ -289,6 +289,7 @@ audioPlayer.addEventListener('timeupdate', function () {
 });
 
 // Play button animation
+
 document.querySelectorAll('.play-btn, .play-small').forEach(btn => {
     btn.addEventListener('click', function (e) {
         e.preventDefault();
