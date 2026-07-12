@@ -71,7 +71,11 @@
             <!-- Header with User Profile -->
             <header class="header">
                 <div class="header-left">
-                    <input type="text" placeholder="Search songs, artists, playlists..." class="search-bar">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input id="searchBar" type="text" placeholder="Search songs, artists, albums..."
+                            class="search-bar">
+                    </div>
                     <span class="favorite-count" id="favoriteCount">0 liked</span>
                 </div>
                 <div class="header-right">
@@ -81,6 +85,7 @@
                     </button>
                 </div>
             </header>
+            <div class="search-status" id="searchResultsInfo">Search songs, artists, albums, and playlists.</div>
             <!-- Featured Section -->
             <section class="featured">
                 <div class="featured-copy">
@@ -191,7 +196,7 @@
 
             <!-- Your Folder Songs -->
             <section class="folder-songs-section">
-     
+
                 <div class="folder-header">
                     <h2>My Folder Songs</h2>
                     <button id="playAllBtn" class="play-all-btn">

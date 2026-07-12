@@ -141,14 +141,47 @@ body {
     z-index: 10;
 }
 
-.search-bar {
+.search-input-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
     width: 400px;
     padding: 10px 16px;
-    border: none;
-    border-radius: 24px;
     background-color: var(--tertiary-color);
+    border-radius: 24px;
+    transition: box-shadow 0.2s ease;
+}
+
+.search-input-wrapper i {
+    color: var(--text-secondary);
+    margin-right: 10px;
+    font-size: 14px;
+}
+
+.search-input-wrapper:focus-within {
+    box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.25);
+}
+
+.search-bar {
+    width: 100%;
+    border: none;
+    background: transparent;
     color: var(--text-primary);
     font-size: 14px;
+}
+
+.search-bar::placeholder {
+    color: var(--text-secondary);
+}
+
+.search-bar:focus {
+    outline: none;
+}
+
+.search-status {
+    padding: 0 30px 14px;
+    color: var(--text-secondary);
+    font-size: 13px;
 }
 
 .favorite-count {

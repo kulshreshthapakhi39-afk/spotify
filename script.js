@@ -232,23 +232,48 @@ updateFavoriteCount();
 // Play All button functionality
 const playAllBtn = document.getElementById('playAllBtn');
 
-function filterCards(query) {
-    const term = query.toLowerCase().trim();
-    document.querySelectorAll('.song-card').forEach(card => {
-        const text = card.textContent.toLowerCase();
-        card.style.display = text.includes(term) ? '' : 'none';
-    });
-    document.querySelectorAll('.track-row').forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(term) ? '' : 'none';
-    });
-    document.querySelectorAll('.uploaded-item').forEach(item => {
-        const text = item.textContent.toLowerCase();
-        item.style.display = text.includes(term) ? '' : 'none';
-    });
+const searchBar = document.getElementById('searchBar');
+const searchResultsInfo = document.getElementById('searchResultsInfo');
+
+function updateSearchResultsInfo(query, matches) {
+    if (!searchResultsInfo) return;
+    if (!query) {
+        searchResultsInfo.textContent = 'Search songs, artists, albums, and playlists.';
+        return;
+    }
+    searchResultsInfo.textContent = matches === 0
+        ? 'No results found. Try another song, artist, or album.'
+        : `Showing ${matches} result${matches === 1 ? '' : 's'} for "${query}"`;
 }
 
-const searchBar = document.querySelector('.search-bar');
+function filterCards(query) {
+    const term = query.toLowerCase().trim();
+    let visibleCount = 0;
+
+    document.querySelectorAll('.song-card').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        const visible = term.length === 0 || text.includes(term);
+        card.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+
+    document.querySelectorAll('.track-row').forEach(row => {
+        const text = row.textContent.toLowerCase();
+        const visible = term.length === 0 || text.includes(term);
+        row.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+
+    document.querySelectorAll('.uploaded-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        const visible = term.length === 0 || text.includes(term);
+        item.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+    });
+
+    updateSearchResultsInfo(term, visibleCount);
+}
+
 if (searchBar) {
     searchBar.addEventListener('input', (e) => filterCards(e.target.value));
 }
@@ -412,6 +437,11 @@ document.querySelectorAll('.nav-item').forEach(item => {
         e.preventDefault();
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
         this.classList.add('active');
+
+        const searchText = this.textContent.trim().toLowerCase();
+        if (searchText === 'search') {
+            searchBar?.focus();
+        }
     });
 });
 
