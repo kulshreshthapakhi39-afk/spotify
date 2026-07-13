@@ -287,6 +287,7 @@ if (playAllBtn) {
 }
 
 
+
 // Auto play next song when current song ends
 audioPlayer.addEventListener('ended', function () {
     playNextSong();
