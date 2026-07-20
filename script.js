@@ -495,4 +495,81 @@ if (greeting) {
     const label = hour < 12 ? 'Morning pulse' : hour < 18 ? 'Afternoon glow' : 'Midnight pulse';
     greeting.textContent = `${label} • Curated for late-night focus`;
 }
+
+const profileBtn = document.getElementById('profileBtn');
+const profileModal = document.getElementById('profileModal');
+const closeProfileModal = document.getElementById('closeProfileModal');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+const profileNameInput = document.getElementById('profileName');
+const profileEmailInput = document.getElementById('profileEmail');
+const profileGenreInput = document.getElementById('profileGenre');
+
+function showProfileModal() {
+    if (profileModal) {
+        profileModal.classList.remove('hidden');
+        profileNameInput?.focus();
+    }
+}
+
+function hideProfileModal() {
+    if (profileModal) {
+        profileModal.classList.add('hidden');
+    }
+}
+
+function getSavedProfile() {
+    try {
+        return JSON.parse(localStorage.getItem('spotifyProfile')) || null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function applySavedProfile() {
+    const profile = getSavedProfile();
+    if (profile && profileBtn) {
+        profileBtn.innerHTML = `<i class="fas fa-user-circle"></i><span>${profile.name}</span>`;
+    }
+}
+
+function saveProfile() {
+    const name = profileNameInput?.value.trim() || '';
+    const email = profileEmailInput?.value.trim() || '';
+    const genre = profileGenreInput?.value.trim() || '';
+
+    if (!name || !email) {
+        alert('Please enter both name and email to create your profile.');
+        return;
+    }
+
+    const profile = { name, email, genre, createdAt: new Date().toISOString() };
+    localStorage.setItem('spotifyProfile', JSON.stringify(profile));
+    applySavedProfile();
+    hideProfileModal();
+}
+
+if (profileBtn) {
+    profileBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        showProfileModal();
+    });
+}
+
+if (closeProfileModal) {
+    closeProfileModal.addEventListener('click', () => hideProfileModal());
+}
+
+if (saveProfileBtn) {
+    saveProfileBtn.addEventListener('click', () => saveProfile());
+}
+
+if (profileModal) {
+    profileModal.addEventListener('click', (event) => {
+        if (event.target === profileModal) {
+            hideProfileModal();
+        }
+    });
+}
+
+applySavedProfile();
 console.log('Spotify Website Loaded Successfully! 🎵');

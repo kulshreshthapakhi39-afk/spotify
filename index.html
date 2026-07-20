@@ -79,7 +79,7 @@
                     <span class="favorite-count" id="favoriteCount">0 liked</span>
                 </div>
                 <div class="header-right">
-                    <button class="btn-user">
+                    <button id="profileBtn" class="btn-user" type="button">
                         <i class="fas fa-user-circle"></i>
                         <span>Profile</span>
                     </button>
@@ -222,6 +222,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        
                         <tr class="track-row" data-index="0">
                             <td>1</td>
                             <td>Fresher Student</td>
@@ -266,6 +267,36 @@
                 </table>
             </section>
         </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <h2>Create Your Profile</h2>
+                    <p>Save a profile for a more personal experience.</p>
+                </div>
+                <button id="closeProfileModal" class="close-modal" type="button"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <label class="modal-field">
+                    <span>Name</span>
+                    <input id="profileName" type="text" placeholder="Your name">
+                </label>
+                <label class="modal-field">
+                    <span>Email</span>
+                    <input id="profileEmail" type="email" placeholder="you@example.com">
+                </label>
+                <label class="modal-field">
+                    <span>Favorite genre</span>
+                    <input id="profileGenre" type="text" placeholder="e.g. Lo-Fi, Hip Hop">
+                </label>
+            </div>
+            <div class="modal-actions">
+                <button id="saveProfileBtn" class="btn-user" type="button">Save Profile</button>
+            </div>
+        </div>
     </div>
 
     <!-- Music Player (Fixed at Bottom) -->
