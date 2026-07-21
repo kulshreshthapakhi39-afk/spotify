@@ -6,26 +6,47 @@ const folderSongs = [
     { title: 'Young & Free', artist: 'Indie Rock', src: 'audio/Audio5.mp3', image: 'images/Image5.jpg', gradient: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)' }
 ];
 
-const audioPlayer = document.getElementById('audioPlayer');
-const folderSongsContainer = document.getElementById('folderSongsContainer');
-const uploadedSongsContainer = document.getElementById('uploadedSongsContainer');
-const playerSong = document.querySelector('.player-song');
-const playerArtist = document.querySelector('.player-artist');
-const uploadBtn = document.getElementById('uploadBtn');
-const songUpload = document.getElementById('songUpload');
-const fileLabel = document.getElementById('fileLabel');
-const favoriteCount = document.getElementById('favoriteCount');
-const shuffleBtn = document.querySelector('.shuffle-btn');
-const repeatBtn = document.querySelector('.repeat-btn');
-const heartBtn = document.querySelector('.heart-btn');
+// ===== UTILITY FUNCTIONS =====
+/**
+ * Debounce function to optimize performance on frequent events
+ * @param {Function} func - Function to debounce
+ * @param {number} delay - Delay in milliseconds
+ * @returns {Function} Debounced function
+ */
+function debounce(func, delay = 300) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
 
-// Playlist state
-let currentSongIndex = -1;
-let isPlayingAll = false;
-let isPlaying = false;
-let shuffleMode = false;
-let repeatMode = false;
-const likedSongs = new Set(JSON.parse(localStorage.getItem('likedSongs') || '[]'));
+/**
+ * Safe DOM query wrapper
+ */
+const q = (selector) => document.querySelector(selector);
+const qa = (selector) => document.querySelectorAll(selector);
+
+// ===== DOM ELEMENTS =====
+
+// ===== DOM ELEMENTS =====
+const audioPlayer = q('#audioPlayer');
+const folderSongsContainer = q('#folderSongsContainer');
+const uploadedSongsContainer = q('#uploadedSongsContainer');
+const playerSong = q('.player-song');
+const playerArtist = q('.player-artist');
+const uploadBtn = q('#uploadBtn');
+const songUpload = q('#songUpload');
+const fileLabel = q('#fileLabel');
+const favoriteCount = q('#favoriteCount');
+const shuffleBtn = q('.shuffle-btn');
+const repeatBtn = q('.repeat-btn');
+const heartBtn = q('.heart-btn');
+const searchBar = q('#searchBar');
+const searchResultsInfo = q('#searchResultsInfo');
+const playAllBtn = q('#playAllBtn');
+
+// ===== PLAYER STATE =====
 
 function saveLikedSongs() {
     localStorage.setItem('likedSongs', JSON.stringify([...likedSongs]));
@@ -109,24 +130,7 @@ function renderUploadedSongs() {
             <button class="uploaded-play-btn"><i class="fas fa-play"></i></button>
         `;
 
-        item.addEventListener('click', () => {
-            playFolderSong(index);
-            isPlayingAll = false;
-        });
-
         uploadedSongsContainer.appendChild(item);
-    });
-}
-
-function bindSongCardEvents() {
-    document.querySelectorAll('.song-card[data-index]').forEach(card => {
-        card.addEventListener('click', () => {
-            const index = Number(card.dataset.index);
-            if (!Number.isNaN(index)) {
-                playFolderSong(index);
-                isPlayingAll = false;
-            }
-        });
     });
 }
 
@@ -232,9 +236,6 @@ updateFavoriteCount();
 // Play All button functionality
 const playAllBtn = document.getElementById('playAllBtn');
 
-const searchBar = document.getElementById('searchBar');
-const searchResultsInfo = document.getElementById('searchResultsInfo');
-
 function updateSearchResultsInfo(query, matches) {
     if (!searchResultsInfo) return;
     if (!query) {
@@ -250,41 +251,79 @@ function filterCards(query) {
     const term = query.toLowerCase().trim();
     let visibleCount = 0;
 
-    document.querySelectorAll('.song-card').forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const visible = term.length === 0 || text.includes(term);
-        card.style.display = visible ? '' : 'none';
-        if (visible) visibleCount++;
-    });
+    // Use event delegation for better performance on dynamically added elements
+    const selectors = ['.song-card', '.track-row', '.uploaded-item'];
 
-    document.querySelectorAll('.track-row').forEach(row => {
-        const text = row.textContent.toLowerCase();
-        const visible = term.length === 0 || text.includes(term);
-        row.style.display = visible ? '' : 'none';
-        if (visible) visibleCount++;
-    });
-
-    document.querySelectorAll('.uploaded-item').forEach(item => {
-        const text = item.textContent.toLowerCase();
-        const visible = term.length === 0 || text.includes(term);
-        item.style.display = visible ? '' : 'none';
-        if (visible) visibleCount++;
+    selectors.forEach(selector => {
+        qa(selector).forEach(card => {
+            const text = card.textContent.toLowerCase();
+            const visible = term.length === 0 || text.includes(term);
+            card.style.display = visible ? '' : 'none';
+            if (visible) visibleCount++;
+        });
     });
 
     updateSearchResultsInfo(term, visibleCount);
 }
 
+// Debounce search input to improve performance
+const debouncedSearch = debounce((query) => filterCards(query), 300);
+
 if (searchBar) {
-    searchBar.addEventListener('input', (e) => filterCards(e.target.value));
+    searchBar.addEventListener('input', (e) => debouncedSearch(e.target.value));
 }
+
+// Play All button
 if (playAllBtn) {
-    playAllBtn.addEventListener('click', function () {
+    playAllBtn.addEventListener('click', () => {
         if (folderSongs.length > 0) {
             isPlayingAll = true;
             playFolderSong(0);
         }
     });
 }
+
+// ===== EVENT DELEGATION FOR DYNAMIC ELEMENTS =====
+// Handle song card clicks with event delegation
+document.addEventListener('click', (e) => {
+    const songCard = e.target.closest('.song-card[data-index]');
+    if (songCard) {
+        const index = Number(songCard.dataset.index);
+        if (!Number.isNaN(index)) {
+            playFolderSong(index);
+            isPlayingAll = false;
+        }
+    }
+
+    // Track row clicks
+    const trackRow = e.target.closest('.track-row[data-index]');
+    if (trackRow) {
+        const index = Number(trackRow.dataset.index);
+        if (!Number.isNaN(index)) {
+            playFolderSong(index);
+        }
+    }
+
+    // Play button in track table
+    const playSmall = e.target.closest('.play-small[data-index]');
+    if (playSmall) {
+        const index = Number(playSmall.dataset.index);
+        if (!Number.isNaN(index)) {
+            playFolderSong(index);
+            isPlayingAll = false;
+        }
+    }
+
+    // Uploaded items
+    const uploadedItem = e.target.closest('.uploaded-item[data-index]');
+    if (uploadedItem) {
+        const index = Number(uploadedItem.dataset.index);
+        if (!Number.isNaN(index)) {
+            playFolderSong(index);
+            isPlayingAll = false;
+        }
+    }
+});
 
 // Auto play next song when current song ends
 audioPlayer.addEventListener('ended', function () {
@@ -295,55 +334,58 @@ audioPlayer.addEventListener('ended', function () {
 audioPlayer.addEventListener('timeupdate', function () {
     if (audioPlayer.duration) {
         const percentage = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-        document.querySelector('.progress-fill').style.width = percentage + '%';
+        const progressFill = q('.progress-fill');
+        if (progressFill) {
+            progressFill.style.width = percentage + '%';
+        }
 
-        // Update time display
+        // Update current time display
         const minutes = Math.floor(audioPlayer.currentTime / 60);
         const seconds = Math.floor(audioPlayer.currentTime % 60);
-        document.querySelector('.time').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-
-        // Update total duration on metadata load
-        if (!audioPlayer.dataset.durationSet) {
-            const totalMinutes = Math.floor(audioPlayer.duration / 60);
-            const totalSeconds = Math.floor(audioPlayer.duration % 60);
-            document.querySelectorAll('.time')[1].textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
-            audioPlayer.dataset.durationSet = 'true';
+        const timeElements = qa('.time');
+        if (timeElements.length > 0) {
+            timeElements[0].textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
     }
 });
 
-// Play button animation
-
-document.querySelectorAll('.play-btn, .play-small').forEach(btn => {
-    btn.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = '';
-        }, 150);
-    });
+// Update total duration on metadata load
+audioPlayer.addEventListener('loadedmetadata', function () {
+    if (!audioPlayer.dataset.durationSet) {
+        const totalMinutes = Math.floor(audioPlayer.duration / 60);
+        const totalSeconds = Math.floor(audioPlayer.duration % 60);
+        const timeElements = qa('.time');
+        if (timeElements.length > 1) {
+            timeElements[1].textContent = `${totalMinutes}:${totalSeconds < 10 ? '0' : ''}${totalSeconds}`;
+        }
+        audioPlayer.dataset.durationSet = 'true';
+    }
 });
 
+// ===== PLAYER CONTROLS EVENTS =====
+
 // Large play button in player
-const playBtnLarge = document.querySelector('.play-btn-large');
+const playBtnLarge = q('.play-btn-large');
 if (playBtnLarge) {
-    playBtnLarge.addEventListener('click', function (e) {
+    playBtnLarge.addEventListener('click', (e) => {
         e.preventDefault();
         togglePlayPause();
     });
 }
 
-// Next and Previous buttons
-const controlBtns = document.querySelectorAll('.control-btn');
-if (controlBtns.length >= 5) {
-    controlBtns[1].addEventListener('click', function () {
-        playPreviousSong();
-    });
-    controlBtns[3].addEventListener('click', function () {
+// Next and Previous buttons using event delegation
+document.addEventListener('click', (e) => {
+    const controlBtns = qa('.control-btn');
+    const nextBtn = controlBtns[3];
+    const prevBtn = controlBtns[1];
+
+    if (e.target.closest('.fa-step-forward') === nextBtn.querySelector('i')) {
         playNextSong();
-    });
-}
+    }
+    if (e.target.closest('.fa-step-backward') === prevBtn.querySelector('i')) {
+        playPreviousSong();
+    }
+});
 
 // Shuffle and Repeat buttons
 if (shuffleBtn) {
@@ -353,32 +395,8 @@ if (repeatBtn) {
     repeatBtn.addEventListener('click', toggleRepeat);
 }
 
-// Table play buttons
-document.querySelectorAll('.play-small').forEach(button => {
-    const index = Number(button.dataset.index);
-    button.addEventListener('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (!Number.isNaN(index)) {
-            playFolderSong(index);
-            isPlayingAll = false;
-        }
-    });
-});
-
-// Search focus styling
-if (searchBar) {
-    searchBar.addEventListener('focus', function () {
-        this.style.boxShadow = '0 0 0 2px #1DB954';
-    });
-
-    searchBar.addEventListener('blur', function () {
-        this.style.boxShadow = 'none';
-    });
-}
-
 // Volume slider update
-const volumeSlider = document.querySelector('.volume-slider');
+const volumeSlider = q('.volume-slider');
 if (volumeSlider) {
     volumeSlider.addEventListener('input', function () {
         const value = this.value;
@@ -388,7 +406,7 @@ if (volumeSlider) {
 }
 
 // Progress bar click
-const progress = document.querySelector('.progress');
+const progress = q('.progress');
 if (progress) {
     progress.addEventListener('click', function (e) {
         if (audioPlayer.duration) {
@@ -397,7 +415,10 @@ if (progress) {
             const x = e.clientX - rect.left;
             const percentage = (x / width) * 100;
             audioPlayer.currentTime = (percentage / 100) * audioPlayer.duration;
-            document.querySelector('.progress-fill').style.width = percentage + '%';
+            const progressFill = q('.progress-fill');
+            if (progressFill) {
+                progressFill.style.width = percentage + '%';
+            }
         }
     });
 }
@@ -419,37 +440,26 @@ if (heartBtn) {
     });
 }
 
-// Track table row click
-document.querySelectorAll('.track-row').forEach(row => {
-    row.addEventListener('click', function () {
-        const title = this.querySelector('td:nth-child(2)')?.textContent;
-        const artist = this.querySelector('td:nth-child(3)')?.textContent;
-        if (title && artist) {
-            console.log(`Playing: ${title} - ${artist}`);
-        }
-    });
-});
-
 // Navigation item active state
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', function (e) {
+document.addEventListener('click', (e) => {
+    const navItem = e.target.closest('.nav-item');
+    if (navItem) {
         e.preventDefault();
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        this.classList.add('active');
+        qa('.nav-item').forEach(nav => nav.classList.remove('active'));
+        navItem.classList.add('active');
 
-        const searchText = this.textContent.trim().toLowerCase();
-        if (searchText === 'search') {
-            searchBar?.focus();
+        const searchText = navItem.textContent.trim().toLowerCase();
+        if (searchText === 'search' && searchBar) {
+            searchBar.focus();
         }
-    });
-});
+    }
 
-// Playlist item click
-document.querySelectorAll('.playlist-item').forEach(item => {
-    item.addEventListener('click', function (e) {
+    // Playlist item click
+    const playlistItem = e.target.closest('.playlist-item');
+    if (playlistItem) {
         e.preventDefault();
-        console.log(`Opened playlist: ${this.textContent}`);
-    });
+        console.log(`Opened playlist: ${playlistItem.textContent}`);
+    }
 });
 
 uploadBtn?.addEventListener('click', () => songUpload?.click());
@@ -475,7 +485,6 @@ songUpload?.addEventListener('change', () => {
     folderSongs.push(newSong);
     renderFolderSongs();
     renderUploadedSongs();
-    bindSongCardEvents();
 
     currentSongIndex = folderSongs.length - 1;
     isPlayingAll = false;
@@ -489,21 +498,14 @@ songUpload?.addEventListener('change', () => {
     songUpload.value = '';
 });
 
-const greeting = document.querySelector('.eyebrow');
+const greeting = q('.eyebrow');
 if (greeting) {
     const hour = new Date().getHours();
     const label = hour < 12 ? 'Morning pulse' : hour < 18 ? 'Afternoon glow' : 'Midnight pulse';
     greeting.textContent = `${label} • Curated for late-night focus`;
 }
 
-const profileBtn = document.getElementById('profileBtn');
-const profileModal = document.getElementById('profileModal');
-const closeProfileModal = document.getElementById('closeProfileModal');
-const saveProfileBtn = document.getElementById('saveProfileBtn');
-const profileNameInput = document.getElementById('profileName');
-const profileEmailInput = document.getElementById('profileEmail');
-const profileGenreInput = document.getElementById('profileGenre');
-
+// ===== PROFILE MODAL MANAGEMENT =====
 function showProfileModal() {
     if (profileModal) {
         profileModal.classList.remove('hidden');
@@ -521,6 +523,7 @@ function getSavedProfile() {
     try {
         return JSON.parse(localStorage.getItem('spotifyProfile')) || null;
     } catch (error) {
+        console.error('Error loading profile:', error);
         return null;
     }
 }
@@ -542,15 +545,22 @@ function saveProfile() {
         return;
     }
 
-    const profile = { name, email, genre, createdAt: new Date().toISOString() };
-    localStorage.setItem('spotifyProfile', JSON.stringify(profile));
-    applySavedProfile();
-    hideProfileModal();
+    try {
+        const profile = { name, email, genre, createdAt: new Date().toISOString() };
+        localStorage.setItem('spotifyProfile', JSON.stringify(profile));
+        applySavedProfile();
+        hideProfileModal();
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        alert('Failed to save profile. Please try again.');
+    }
+}
 }
 
+// ===== PROFILE MODAL EVENTS =====
 if (profileBtn) {
-    profileBtn.addEventListener('click', (event) => {
-        event.preventDefault();
+    profileBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         showProfileModal();
     });
 }
@@ -564,12 +574,13 @@ if (saveProfileBtn) {
 }
 
 if (profileModal) {
-    profileModal.addEventListener('click', (event) => {
-        if (event.target === profileModal) {
+    profileModal.addEventListener('click', (e) => {
+        if (e.target === profileModal) {
             hideProfileModal();
         }
     });
 }
 
+// ===== INITIALIZATION =====
 applySavedProfile();
-console.log('Spotify Website Loaded Successfully! 🎵');
+console.log('🎵 Spotify Player loaded successfully!');
