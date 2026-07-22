@@ -555,7 +555,7 @@ function saveProfile() {
         alert('Failed to save profile. Please try again.');
     }
 }
-}
+
 
 // ===== PROFILE MODAL EVENTS =====
 if (profileBtn) {

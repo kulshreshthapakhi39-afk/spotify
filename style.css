@@ -1406,6 +1406,7 @@ body {
     .songs-section h2,
     .popular-section h2 {
         font-size: 18px;
+        
     }
 
     .songs-container {
@@ -1426,12 +1427,6 @@ body {
     }
 }
 
-height: 12px;
-border-radius: 50%;
-background-color: var(--text-primary);
-cursor: pointer;
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
 
 .volume-slider::-moz-range-thumb {
     width: 12px;
