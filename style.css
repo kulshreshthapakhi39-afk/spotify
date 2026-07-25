@@ -965,6 +965,109 @@ body {
     justify-content: flex-end;
 }
 
+.playback-rate {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+/* Visualizer */
+.visualizer-canvas {
+    position: fixed;
+    bottom: 90px;
+    left: 0;
+    right: 0;
+    height: 80px;
+    width: 100%;
+    z-index: 19;
+    pointer-events: none;
+    background: transparent;
+}
+
+/* Lyrics panel */
+.lyrics-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 130px;
+    width: 340px;
+    max-height: 50vh;
+    background: rgba(18, 20, 24, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 12px;
+    z-index: 40;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.lyrics-panel.hidden {
+    display: none;
+}
+
+.lyrics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.lyrics-content {
+    color: var(--text-secondary);
+    font-size: 13px;
+    overflow: auto;
+    max-height: 40vh;
+    padding-right: 6px;
+}
+
+.lyrics-actions {
+    margin-top: 8px;
+    text-align: right;
+}
+
+/* Queue modal tweaks */
+.queue-modal {
+    width: min(520px, 95%);
+}
+
+.queue-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.queue-info strong {
+    display: block;
+    font-size: 14px;
+}
+
+.queue-info small {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.queue-actions button {
+    margin-left: 6px;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.queue-actions button:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.control-btn.crossfade-toggle.active {
+    color: var(--primary-color);
+}
+
 .volume-btn {
     background: none;
     border: none;
@@ -1406,7 +1509,7 @@ body {
     .songs-section h2,
     .popular-section h2 {
         font-size: 18px;
-        
+
     }
 
     .songs-container {

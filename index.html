@@ -100,11 +100,11 @@
                         <span class="chip">Focus Flow</span>
                     </div>
                 </div>n -->
-                <div class="stat-grid">
-                    <article class="stat-card"><strong>18</strong><span>Curated moods</span></article>
-                    <article class="stat-card"><strong>5</strong><span>Live tracks</span></article>
-                    <article class="stat-card"><strong>100%</strong><span>Personalized vibe</span></article>
-                </div>
+            <div class="stat-grid">
+                <article class="stat-card"><strong>18</strong><span>Curated moods</span></article>
+                <article class="stat-card"><strong>5</strong><span>Live tracks</span></article>
+                <article class="stat-card"><strong>100%</strong><span>Personalized vibe</span></article>
+            </div>
             </section>
 
             <section class="mood-strip">
@@ -222,11 +222,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+
                         <tr class="track-row" data-index="0">
                             <td>1</td>
                             <td>Fresher Student</td>
-                            <td>College Vibes</td>     
+                            <td>College Vibes</td>
                             <td>New Beginning</td>
                             <td>3:45</td>
                             <td><button class="play-small" data-index="0"><i class="fas fa-play"></i></button></td>
@@ -336,9 +336,49 @@
             <div class="volume-bar">
                 <input type="range" min="0" max="100" value="70" class="volume-slider">
             </div>
+            <select id="playbackRate" class="playback-rate" title="Playback speed">
+                <option value="0.5">0.5×</option>
+                <option value="0.75">0.75×</option>
+                <option value="1" selected>1×</option>
+                <option value="1.25">1.25×</option>
+                <option value="1.5">1.5×</option>
+                <option value="2">2×</option>
+            </select>
+            <button class="control-btn crossfade-toggle" title="Crossfade"><i class="fas fa-exchange-alt"></i></button>
+            <button id="shareBtn" class="control-btn" title="Share track"><i class="fas fa-share-alt"></i></button>
+            <button id="queueBtn" class="control-btn" title="Open queue"><i class="fas fa-list"></i></button>
             <button class="fullscreen-btn"><i class="fas fa-expand"></i></button>
         </div>
     </footer>
+
+    <!-- Visualizer Canvas (above player) -->
+    <canvas id="visualizer" class="visualizer-canvas" width="1024" height="100"></canvas>
+
+    <!-- Lyrics Panel -->
+    <div id="lyricsPanel" class="lyrics-panel hidden">
+        <div class="lyrics-header">
+            <h4>Lyrics</h4>
+            <button id="closeLyrics" class="close-modal"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="lyricsContent" class="lyrics-content">No lyrics available. Click edit to add lyrics.</div>
+        <div class="lyrics-actions">
+            <button id="editLyricsBtn" class="btn-user">Edit Lyrics</button>
+        </div>
+    </div>
+
+    <!-- Queue Modal -->
+    <div id="queueModal" class="modal-overlay hidden">
+        <div class="modal queue-modal">
+            <div class="modal-header">
+                <h2>Play Queue</h2>
+                <button id="closeQueueModal" class="close-modal" type="button"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="queueList"></div>
+            <div class="modal-actions">
+                <button id="clearQueueBtn" class="btn-user">Clear Queue</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

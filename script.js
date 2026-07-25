@@ -234,7 +234,7 @@ renderUploadedSongs();
 updateFavoriteCount();
 
 // Play All button functionality
-const playAllBtn = document.getElementById('playAllBtn');
+// playAllBtn is already referenced via `q('#playAllBtn')` earlier
 
 function updateSearchResultsInfo(query, matches) {
     if (!searchResultsInfo) return;
@@ -280,6 +280,278 @@ if (playAllBtn) {
             isPlayingAll = true;
             playFolderSong(0);
         }
+    });
+}
+
+// ===== NEW FEATURES: Visualizer, Lyrics, Playback Rate, Queue, Crossfade, Share =====
+let audioContext = null;
+let analyser = null;
+let sourceNode = null;
+let animationId = null;
+const visualizerCanvas = q('#visualizer');
+const queueBtn = q('#queueBtn');
+const queueModal = q('#queueModal');
+const queueList = q('#queueList');
+const closeQueueModal = q('#closeQueueModal');
+const clearQueueBtn = q('#clearQueueBtn');
+const playbackRateSelect = q('#playbackRate');
+const crossfadeToggle = q('.crossfade-toggle');
+const shareBtn = q('#shareBtn');
+const lyricsPanel = q('#lyricsPanel');
+const closeLyrics = q('#closeLyrics');
+const editLyricsBtn = q('#editLyricsBtn');
+const lyricsContent = q('#lyricsContent');
+
+let crossfadeEnabled = false;
+let queue = []; // stores indexes into folderSongs
+
+function ensureAudioContext() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+    }
+    if (!sourceNode && audioPlayer) {
+        try {
+            sourceNode = audioContext.createMediaElementSource(audioPlayer);
+            sourceNode.connect(analyser);
+            analyser.connect(audioContext.destination);
+        } catch (e) {
+            // some browsers disallow multiple creations; ignore
+            console.warn('Audio source setup warning', e);
+        }
+    }
+}
+
+function drawVisualizer() {
+    if (!visualizerCanvas || !analyser) return;
+    const canvas = visualizerCanvas;
+    const ctx = canvas.getContext('2d');
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    function draw() {
+        animationId = requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
+        ctx.fillStyle = 'rgba(9,10,12,0.75)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let x = 0;
+        for (let i = 0; i < bufferLength; i++) {
+            const barHeight = dataArray[i] / 2;
+            ctx.fillStyle = `rgb(${barHeight + 100}, ${200 - barHeight}, 180)`;
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+    }
+    if (!animationId) draw();
+}
+
+function startVisualizerIfNeeded() {
+    try {
+        ensureAudioContext();
+        if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+        drawVisualizer();
+    } catch (err) {
+        console.error('Visualizer error:', err);
+    }
+}
+
+// Playback rate control
+if (playbackRateSelect) {
+    playbackRateSelect.addEventListener('change', (e) => {
+        audioPlayer.playbackRate = Number(e.target.value) || 1;
+    });
+}
+
+// Crossfade toggle
+if (crossfadeToggle) {
+    crossfadeToggle.addEventListener('click', () => {
+        crossfadeEnabled = !crossfadeEnabled;
+        crossfadeToggle.classList.toggle('active', crossfadeEnabled);
+    });
+}
+
+// Share current track
+if (shareBtn) {
+    shareBtn.addEventListener('click', async () => {
+        const track = folderSongs[currentSongIndex];
+        if (!track) return alert('No track playing');
+        const text = `${track.title} — ${track.artist}`;
+        try {
+            await navigator.clipboard.writeText(text);
+            alert('Track copied to clipboard');
+        } catch (err) {
+            console.warn('Clipboard failed', err);
+            prompt('Copy this text:', text);
+        }
+    });
+}
+
+// Queue management
+function addToQueue(index) {
+    if (typeof index !== 'number' || index < 0) return;
+    queue.push(index);
+    renderQueue();
+}
+
+function renderQueue() {
+    if (!queueList) return;
+    queueList.innerHTML = '';
+    if (queue.length === 0) {
+        queueList.innerHTML = '<p class="upload-placeholder">Queue is empty.</p>';
+        return;
+    }
+    queue.forEach((songIndex, i) => {
+        const s = folderSongs[songIndex];
+        const row = document.createElement('div');
+        row.className = 'queue-row';
+        row.innerHTML = `
+            <div class="queue-info"><strong>${s.title}</strong><small>${s.artist}</small></div>
+            <div class="queue-actions">
+                <button data-i="${i}" class="btn-up">▲</button>
+                <button data-i="${i}" class="btn-down">▼</button>
+                <button data-i="${i}" class="btn-remove">✖</button>
+            </div>
+        `;
+        queueList.appendChild(row);
+    });
+}
+
+if (queueBtn) {
+    queueBtn.addEventListener('click', () => {
+        if (queueModal) queueModal.classList.remove('hidden');
+        renderQueue();
+    });
+}
+if (closeQueueModal) closeQueueModal.addEventListener('click', () => queueModal?.classList.add('hidden'));
+if (clearQueueBtn) clearQueueBtn.addEventListener('click', () => { queue = []; renderQueue(); });
+
+document.addEventListener('click', (e) => {
+    const up = e.target.closest('.btn-up');
+    const down = e.target.closest('.btn-down');
+    const rem = e.target.closest('.btn-remove');
+    if (up || down || rem) {
+        const i = Number((up || down || rem).dataset.i);
+        if (Number.isNaN(i)) return;
+        if (up) {
+            if (i > 0) {
+                [queue[i - 1], queue[i]] = [queue[i], queue[i - 1]];
+            }
+        } else if (down) {
+            if (i < queue.length - 1) {
+                [queue[i + 1], queue[i]] = [queue[i], queue[i + 1]];
+            }
+        } else if (rem) {
+            queue.splice(i, 1);
+        }
+        renderQueue();
+    }
+});
+
+// Lyrics panel simple editor
+if (editLyricsBtn) {
+    editLyricsBtn.addEventListener('click', () => {
+        const current = lyricsContent.textContent || '';
+        const newText = prompt('Edit lyrics (paste full lyrics):', current);
+        if (newText !== null) {
+            lyricsContent.textContent = newText;
+            localStorage.setItem('lyrics', newText);
+        }
+    });
+}
+if (closeLyrics) closeLyrics.addEventListener('click', () => lyricsPanel?.classList.add('hidden'));
+
+// Load saved lyrics
+const savedLyrics = localStorage.getItem('lyrics');
+if (savedLyrics) lyricsContent.textContent = savedLyrics;
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        togglePlayPause();
+        startVisualizerIfNeeded();
+    }
+    if (e.code === 'ArrowRight') playNextSong();
+    if (e.code === 'ArrowLeft') playPreviousSong();
+    if (e.code === 'KeyL') {
+        if (lyricsPanel) lyricsPanel.classList.toggle('hidden');
+    }
+    if (e.code === 'KeyQ') {
+        if (queueModal) queueModal.classList.toggle('hidden');
+    }
+    if (e.code === 'ArrowUp') {
+        audioPlayer.volume = Math.min(1, audioPlayer.volume + 0.05);
+        if (volumeSlider) volumeSlider.value = Math.round(audioPlayer.volume * 100);
+    }
+    if (e.code === 'ArrowDown') {
+        audioPlayer.volume = Math.max(0, audioPlayer.volume - 0.05);
+        if (volumeSlider) volumeSlider.value = Math.round(audioPlayer.volume * 100);
+    }
+});
+
+// Crossfade implementation: small fade between tracks
+function crossfadeTo(index) {
+    if (!audioPlayer || !folderSongs[index]) return playFolderSong(index);
+    if (!crossfadeEnabled) return playFolderSong(index);
+    const fadeTime = 2.0; // seconds
+    const initialVolume = audioPlayer.volume;
+    const targetSrc = folderSongs[index].src;
+
+    // fade out
+    const steps = 20;
+    let step = 0;
+    const fadeOut = setInterval(() => {
+        step++;
+        audioPlayer.volume = initialVolume * (1 - step / steps);
+        if (step >= steps) {
+            clearInterval(fadeOut);
+            audioPlayer.pause();
+            audioPlayer.src = targetSrc;
+            audioPlayer.currentTime = 0;
+            audioPlayer.play().catch(() => { });
+            // fade in
+            let inStep = 0;
+            const fadeIn = setInterval(() => {
+                inStep++;
+                audioPlayer.volume = initialVolume * (inStep / steps);
+                if (inStep >= steps) clearInterval(fadeIn);
+            }, (fadeTime / steps) * 1000);
+            setNowPlaying(folderSongs[index]);
+            currentSongIndex = index;
+            isPlaying = true;
+            updatePlayButton();
+        }
+    }, (fadeTime / steps) * 1000);
+}
+
+// Hook into playNextSong to use crossfade when enabled
+const originalPlayNext = playNextSong;
+function playNextSongWrapped() {
+    const nextIndex = getNextIndex();
+    if (nextIndex !== -1) {
+        if (crossfadeEnabled) crossfadeTo(nextIndex);
+        else playFolderSong(nextIndex);
+        isPlayingAll = true;
+    } else {
+        isPlayingAll = false;
+        audioPlayer.pause();
+        isPlaying = false;
+        updatePlayButton();
+    }
+}
+// replace usage
+playNextSong = playNextSongWrapped;
+
+// Start visualizer on any user-play action
+audioPlayer.addEventListener('play', () => startVisualizerIfNeeded());
+
+// Service worker registration for offline caching (optional)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker?.register('sw.js').catch(() => { /* ignore */ });
     });
 }
 
