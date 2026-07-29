@@ -555,6 +555,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+
 // ===== EVENT DELEGATION FOR DYNAMIC ELEMENTS =====
 // Handle song card clicks with event delegation
 document.addEventListener('click', (e) => {
